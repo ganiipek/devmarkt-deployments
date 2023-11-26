@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mail-deployment
+  namespace: devmarkt-dev
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # how many pods we can add at a time
+      maxUnavailable: 0  # maxUnavailable define how many pods can be unavailable during the rolling update
+  selector:
+    matchLabels:
+      mail-service: app
+  template:
+    metadata:
+      labels:
+        mail-service: app
+    spec:
+      containers:
+        - image: ganiipek/devmarkt-mail-service:latest
+          name: mail-dp
+          imagePullPolicy: Always
+                
+      imagePullSecrets:
+        - name: regcred

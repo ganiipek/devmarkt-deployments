@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-deployment
+  namespace: devmarkt-dev
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # how many pods we can add at a time
+      maxUnavailable: 1  # maxUnavailable define how many pods can be unavailable during the rolling update
+  selector:
+    matchLabels:
+      customer-service: app
+  template:
+    metadata:
+      labels:
+        customer-service: app
+    spec:
+      containers:
+        - name: customer-dp
+          image: ganiipek/devmarkt-customer-service:latest
+          ports:
+            - containerPort: 8010
+              name: customer-dp
+          imagePullPolicy: Always
+          env: 
+          - name: FRONTEND_URL
+            value: "https://dashboard-dev.devmarkt.tech"
+          - name: BACKEND_URL
+            value: "https://dashboard-devapi.devmarkt.tech:2096/v1/customer"
+          - name: SECRET_RECAPTCHA_SECRET_KEY
+            value: "6LffqBwpAAAAAHPeUx11SvJgsOI5q8pfFB9laluQ"
+      imagePullSecrets:
+        - name: regcred
+

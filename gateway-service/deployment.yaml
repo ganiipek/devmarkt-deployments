@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  namespace: devmarkt-dev
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # how many pods we can add at a time
+      maxUnavailable: 1  # maxUnavailable define how many pods can be unavailable during the rolling update
+  selector:
+    matchLabels:
+      gateway-service: app
+  template:
+    metadata:
+      labels:
+        gateway-service: app
+    spec:
+      containers:
+        - name: gateway-dp
+          image: ganiipek/devmarkt-gateway-service:latest
+          ports:
+            - containerPort: 8080
+              name: gateway-dp
+          imagePullPolicy: Always
+          env: 
+          - name: CUSTOMER_SERVICE_HOST
+            value: "customer-service.devmarkt-dev.svc.cluster.local"
+          - name: CUSTOMER_SERVICE_PORT
+            value: "8010"
+      imagePullSecrets:
+        - name: regcred
+
